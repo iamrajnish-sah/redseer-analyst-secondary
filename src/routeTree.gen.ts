@@ -9,38 +9,82 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReferenceRouteImport } from './routes/reference'
+import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MonthMonthRouteImport } from './routes/month.$month'
 
+const ReferenceRoute = ReferenceRouteImport.update({
+  id: '/reference',
+  path: '/reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuhuratRoute = MuhuratRouteImport.update({
+  id: '/muhurat',
+  path: '/muhurat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MonthMonthRoute = MonthMonthRouteImport.update({
+  id: '/month/$month',
+  path: '/month/$month',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/muhurat': typeof MuhuratRoute
+  '/reference': typeof ReferenceRoute
+  '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/muhurat': typeof MuhuratRoute
+  '/reference': typeof ReferenceRoute
+  '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/muhurat': typeof MuhuratRoute
+  '/reference': typeof ReferenceRoute
+  '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/muhurat' | '/reference' | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/muhurat' | '/reference' | '/month/$month'
+  id: '__root__' | '/' | '/muhurat' | '/reference' | '/month/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MuhuratRoute: typeof MuhuratRoute
+  ReferenceRoute: typeof ReferenceRoute
+  MonthMonthRoute: typeof MonthMonthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reference': {
+      id: '/reference'
+      path: '/reference'
+      fullPath: '/reference'
+      preLoaderRoute: typeof ReferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/muhurat': {
+      id: '/muhurat'
+      path: '/muhurat'
+      fullPath: '/muhurat'
+      preLoaderRoute: typeof MuhuratRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +92,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/month/$month': {
+      id: '/month/$month'
+      path: '/month/$month'
+      fullPath: '/month/$month'
+      preLoaderRoute: typeof MonthMonthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MuhuratRoute: MuhuratRoute,
+  ReferenceRoute: ReferenceRoute,
+  MonthMonthRoute: MonthMonthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
