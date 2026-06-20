@@ -32,9 +32,10 @@ const impactColor: Record<Impact, string> = {
 };
 
 function MonthPage() {
-  const { month } = Route.useParams();
-  const monthKey = month;
+  const params = Route.useParams() as { month: MonthKey };
+  const monthKey: MonthKey = params.month;
   const longName = MONTH_FULL[monthKey];
+
 
   return (
     <AppShell>
