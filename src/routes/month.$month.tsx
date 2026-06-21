@@ -83,10 +83,11 @@ function MonthPage() {
   );
 }
 
-/* ------------- 1 Calendar & Festivals ------------- */
+/* ------------- 1 Calendar & Festivals (+ Academic Cycles) ------------- */
 function CalendarSection({ monthKey }: { monthKey: MonthKey }) {
   const baseline = FESTIVALS[monthKey] ?? [];
   const [rows, setRows] = usePersistentState(`fest::${monthKey}`, baseline);
+  const academic = ACADEMIC_CYCLES[monthKey] ?? [];
 
   return (
     <Panel title={`1 · Calendar & Festivals`} accent="gold">
@@ -127,21 +128,39 @@ function CalendarSection({ monthKey }: { monthKey: MonthKey }) {
           </tbody>
         </table>
       </div>
+
+      {/* Academic cycle overlay */}
+      <div className="mt-3 panel-2 px-3 py-2">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
+          <span className="label-caps">Academic Cycle Overlay</span>
+        </div>
+        {academic.length === 0 ? (
+          <div className="mt-1 text-[11px] text-muted-foreground">No major school/college calendar markers for this month.</div>
+        ) : (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {academic.map(a => (
+              <span key={a} className="rounded-sm bg-[color:var(--color-primary)]/10 px-2 py-0.5 text-[11px] font-medium text-[color:var(--color-primary)] ring-1 ring-[color:var(--color-primary)]/30">
+                {a}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </Panel>
   );
 }
 
-/* ------------- 2 Muhurats ------------- */
+/* ------------- 2 Muhurats (CY vs LY side-by-side + dates grid) ------------- */
 function MuhuratSection({ monthKey }: { monthKey: MonthKey }) {
-  const baseline = MUHURATS[monthKey];
-  const [m, setM] = usePersistentState(`muh::${monthKey}`, baseline);
+  const baseline = MUHURATS_V2[monthKey];
+  const [m, setM] = usePersistentState(`muh2::${monthKey}`, baseline);
 
-  const fields: Array<{ key: keyof typeof m; label: string }> = [
-    { key:"shaadi", label:"Shaadi (Wedding)" },
-    { key:"janeu", label:"Janeu (Thread)" },
-    { key:"namkaran", label:"Namkaran" },
+  const counts: Array<{ key: "shaadi"|"janeu"|"namkaran"|"grihaPravesh"; label: string }> = [
+    { key:"shaadi",       label:"Shaadi (Wedding)" },
+    { key:"janeu",        label:"Janeu (Thread)" },
+    { key:"namkaran",     label:"Namkaran" },
     { key:"grihaPravesh", label:"Griha Pravesh" },
-    { key:"annaprashan", label:"Annaprashan" },
   ];
 
   return (
@@ -150,32 +169,73 @@ function MuhuratSection({ monthKey }: { monthKey: MonthKey }) {
         <div className="mb-3 flex items-start gap-2 rounded-sm border border-[color:var(--color-risk)]/60 bg-[color:var(--color-risk)]/10 px-3 py-2 text-xs">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--color-risk)]" />
           <div>
-            <div className="font-bold tracking-wide text-[color:var(--color-risk)] uppercase">⚠️ Inauspicious Window Detected — {m.blockout}</div>
-            <div className="mt-0.5 text-muted-foreground">Discretionary FMCG & retail spend traditionally paused. Verify with primary telemetry before sizing.</div>
+            <div className="font-bold tracking-wide text-[color:var(--color-risk)] uppercase">⚠️ Inauspicious Window — {m.blockout}</div>
+            <div className="mt-0.5 text-muted-foreground">Discretionary FMCG & retail spend traditionally paused. Verify with primary telemetry.</div>
           </div>
         </div>
       )}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {fields.map(f => (
-          <label key={String(f.key)} className="panel-2 flex flex-col gap-1 px-3 py-2">
-            <span className="label-caps">{f.label}</span>
-            <input
-              type="number"
-              min={0}
-              value={m[f.key] as number}
-              onChange={(e) => setM({ ...m, [f.key]: Number(e.target.value) })}
-              className="num bg-transparent text-lg font-bold focus:outline-hidden"
-            />
-          </label>
-        ))}
+
+      <div className="grid grid-cols-2 gap-2">
+        {counts.map(f => {
+          const cy = m[f.key].cy; const ly = m[f.key].ly;
+          const diff = cy - ly;
+          const cls = diff > 0 ? "text-[color:var(--color-up)]" : diff < 0 ? "text-[color:var(--color-down)]" : "text-[color:var(--color-flat)]";
+          return (
+            <div key={f.key} className="panel-2 px-3 py-2">
+              <div className="label-caps">{f.label}</div>
+              <div className="mt-1 flex items-baseline gap-2">
+                <input
+                  type="number" min={0} value={cy}
+                  onChange={(e) => setM({ ...m, [f.key]: { ...m[f.key], cy: Number(e.target.value) } })}
+                  className="num w-12 bg-transparent text-xl font-bold focus:outline-hidden"
+                />
+                <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Days CY</span>
+                <span className="text-muted-foreground">vs</span>
+                <input
+                  type="number" min={0} value={ly}
+                  onChange={(e) => setM({ ...m, [f.key]: { ...m[f.key], ly: Number(e.target.value) } })}
+                  className="num w-12 bg-transparent text-base font-semibold text-muted-foreground focus:outline-hidden"
+                />
+                <span className="text-[10px] tracking-wider text-muted-foreground uppercase">LY</span>
+                <span className={`ml-auto num text-xs font-semibold ${cls}`}>{diff > 0 ? `+${diff}` : diff}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Comparative dates grid */}
+      <div className="mt-3 panel-2 px-3 py-2">
+        <div className="label-caps mb-1.5">Comparative Wedding Muhurat Dates · {MONTH_FULL[monthKey]}</div>
+        <div className="grid grid-cols-2 gap-3 text-[11px]">
+          <div>
+            <div className="text-muted-foreground">2025 (CY) · {m.datesCY.length} dates</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {m.datesCY.length === 0 && <span className="text-muted-foreground">—</span>}
+              {m.datesCY.map(d => (
+                <span key={d} className="num rounded-sm bg-[color:var(--color-up)]/12 px-1.5 py-0.5 font-semibold text-[color:var(--color-up)] ring-1 ring-[color:var(--color-up)]/30">{d}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">2024 (LY) · {m.datesLY.length} dates</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {m.datesLY.length === 0 && <span className="text-muted-foreground">—</span>}
+              {m.datesLY.map(d => (
+                <span key={d} className="num rounded-sm bg-[color:var(--color-flat)]/15 px-1.5 py-0.5 font-medium text-muted-foreground ring-1 ring-border">{d}</span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Panel>
   );
 }
 
-/* ------------- 3 Platform Sale Events ------------- */
+/* ------------- 3 Platform Sale Events + Tagline Tracker ------------- */
 function PlatformSaleSection({ monthKey }: { monthKey: MonthKey }) {
   const [rows] = usePersistentState(`sales::${monthKey}`, SALE_EVENTS[monthKey] ?? []);
+  const [tagline, setTagline] = usePersistentState(`tagline::${monthKey}`, SALE_TAGLINES_DEFAULTS[monthKey] ?? "");
   return (
     <Panel title="3 · Platform Sale Events" accent="teal">
       <div className="space-y-1.5">
@@ -187,6 +247,18 @@ function PlatformSaleSection({ monthKey }: { monthKey: MonthKey }) {
             <div className="num text-muted-foreground">{s.window}</div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-3 panel-2 px-3 py-2">
+        <label className="label-caps">Ad Campaign Tagline / Punchline Tracker</label>
+        <textarea
+          value={tagline}
+          onChange={(e) => setTagline(e.target.value)}
+          rows={3}
+          placeholder="Log specific slogans run by platforms this month — e.g. 'Sabse bada sale', 'Pink Friday', etc."
+          className="mt-1 w-full resize-y rounded-sm bg-transparent text-xs leading-relaxed focus:outline-hidden"
+        />
+        <div className="mt-1 text-[10px] text-muted-foreground">Tracks promotion aggression beyond standard sale dates.</div>
       </div>
     </Panel>
   );
