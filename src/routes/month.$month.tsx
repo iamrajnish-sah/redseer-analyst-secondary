@@ -1,12 +1,12 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { AppShell, Panel, Delta } from "@/components/AppShell";
 import {
-  MONTHS, MONTH_FULL, type MonthKey, FESTIVALS, MUHURATS, SALE_EVENTS,
-  PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS, SUPPLY_FACTORS,
-  SEASON_PROFILE,
+  MONTHS, MONTH_FULL, type MonthKey, FESTIVALS, MUHURATS_V2, SALE_EVENTS, SALE_TAGLINES_DEFAULTS,
+  PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS_V2, SUPPLY_FACTORS,
+  SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
 import { usePersistentState } from "@/lib/storage";
-import { AlertTriangle, TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/month/$month")({
   parseParams: ({ month }) => {

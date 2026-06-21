@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadHubRouteImport } from './routes/upload-hub'
+import { Route as SimilarwebRouteImport } from './routes/similarweb'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
@@ -17,6 +18,11 @@ import { Route as MonthMonthRouteImport } from './routes/month.$month'
 const UploadHubRoute = UploadHubRouteImport.update({
   id: '/upload-hub',
   path: '/upload-hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SimilarwebRoute = SimilarwebRouteImport.update({
+  id: '/similarweb',
+  path: '/similarweb',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReferenceRoute = ReferenceRouteImport.update({
@@ -38,12 +44,14 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
@@ -51,20 +59,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reference' | '/upload-hub' | '/month/$month'
+  fullPaths:
+    | '/'
+    | '/reference'
+    | '/similarweb'
+    | '/upload-hub'
+    | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reference' | '/upload-hub' | '/month/$month'
-  id: '__root__' | '/' | '/reference' | '/upload-hub' | '/month/$month'
+  to: '/' | '/reference' | '/similarweb' | '/upload-hub' | '/month/$month'
+  id:
+    | '__root__'
+    | '/'
+    | '/reference'
+    | '/similarweb'
+    | '/upload-hub'
+    | '/month/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ReferenceRoute: typeof ReferenceRoute
+  SimilarwebRoute: typeof SimilarwebRoute
   UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
 }
@@ -76,6 +97,13 @@ declare module '@tanstack/react-router' {
       path: '/upload-hub'
       fullPath: '/upload-hub'
       preLoaderRoute: typeof UploadHubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/similarweb': {
+      id: '/similarweb'
+      path: '/similarweb'
+      fullPath: '/similarweb'
+      preLoaderRoute: typeof SimilarwebRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reference': {
@@ -105,6 +133,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ReferenceRoute: ReferenceRoute,
+  SimilarwebRoute: SimilarwebRoute,
   UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
 }
