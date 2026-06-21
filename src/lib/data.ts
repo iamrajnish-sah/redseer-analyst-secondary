@@ -350,3 +350,173 @@ export const REFERENCE_LIBRARY: ReferenceFactor[] = [
   { name:"E-way Bill Generation", category:"Supply Chain", why:"Movement-of-goods proxy.", source:"GSTN", freq:"Monthly" },
   { name:"Festive SKU Lead-Time Tracker", category:"Supply Chain", why:"OOS risk for star SKUs.", source:"Internal tracker", freq:"Weekly" },
 ];
+
+/* ============================================================
+   v2 ADDITIONS — academic cycles, muhurat restructure, sale taglines,
+   electronics imports, similarweb, mock news feed, segment indicators
+   ============================================================ */
+
+export const ACADEMIC_CYCLES: Record<MonthKey, string[]> = {
+  Jan: ["Pre-board prep window", "Coaching cycle peak (JEE/NEET/CUET)"],
+  Feb: ["Pre-board prep window", "Coaching cycle peak"],
+  Mar: ["School board exams", "Academic session endings", "Summer vacation onset"],
+  Apr: ["Session endings", "Results season", "Summer vacation"],
+  May: ["Summer vacation peak", "Admissions counselling begins"],
+  Jun: ["New academic year reopening", "School/college admissions", "Back-to-school supply demand"],
+  Jul: ["School/college admissions", "Back-to-school supply demand"],
+  Aug: [],
+  Sep: [],
+  Oct: ["Mid-term festival breaks", "College & university fests"],
+  Nov: ["College & university fests"],
+  Dec: ["Winter vacation onset"],
+};
+
+export interface MuhuratV2 {
+  shaadi: { cy: number; ly: number };
+  janeu: { cy: number; ly: number };
+  namkaran: { cy: number; ly: number };
+  grihaPravesh: { cy: number; ly: number };
+  datesCY: string[];
+  datesLY: string[];
+  blockout?: "Shraadh / Pitru Paksha" | "Kharmas" | "Chaturmas (No Weddings)";
+}
+
+export const MUHURATS_V2: Record<MonthKey, MuhuratV2> = {
+  Jan: { shaadi:{cy:6,ly:5}, janeu:{cy:2,ly:2}, namkaran:{cy:4,ly:3}, grihaPravesh:{cy:5,ly:4},
+    datesCY:["16","17","18","20","21","27"], datesLY:["16","17","21","22","28"], blockout:"Kharmas" },
+  Feb: { shaadi:{cy:14,ly:13}, janeu:{cy:4,ly:3}, namkaran:{cy:6,ly:5}, grihaPravesh:{cy:7,ly:6},
+    datesCY:["02","03","06","07","12","13","14","18","19","21","23","25","27","28"],
+    datesLY:["04","06","07","12","13","17","18","19","23","24","25","26","27"] },
+  Mar: { shaadi:{cy:6,ly:8}, janeu:{cy:2,ly:3}, namkaran:{cy:3,ly:4}, grihaPravesh:{cy:4,ly:5},
+    datesCY:["01","02","05","06","07","12"], datesLY:["02","03","04","05","09","11","12","13"] },
+  Apr: { shaadi:{cy:9,ly:10}, janeu:{cy:5,ly:5}, namkaran:{cy:6,ly:7}, grihaPravesh:{cy:7,ly:8},
+    datesCY:["14","16","17","18","19","20","21","25","30"],
+    datesLY:["18","19","20","21","22","23","24","25","26","27"] },
+  May: { shaadi:{cy:10,ly:11}, janeu:{cy:6,ly:6}, namkaran:{cy:7,ly:7}, grihaPravesh:{cy:8,ly:8},
+    datesCY:["01","05","06","08","14","15","17","22","23","28"],
+    datesLY:["02","03","06","07","10","11","12","17","18","20","23"] },
+  Jun: { shaadi:{cy:5,ly:6}, janeu:{cy:2,ly:2}, namkaran:{cy:3,ly:3}, grihaPravesh:{cy:3,ly:4},
+    datesCY:["02","04","07","08","11"], datesLY:["01","03","09","10","17","22"] },
+  Jul: { shaadi:{cy:2,ly:3}, janeu:{cy:1,ly:1}, namkaran:{cy:1,ly:2}, grihaPravesh:{cy:1,ly:1},
+    datesCY:["06","11"], datesLY:["09","11","15"], blockout:"Chaturmas (No Weddings)" },
+  Aug: { shaadi:{cy:0,ly:0}, janeu:{cy:0,ly:0}, namkaran:{cy:0,ly:0}, grihaPravesh:{cy:0,ly:0},
+    datesCY:[], datesLY:[], blockout:"Chaturmas (No Weddings)" },
+  Sep: { shaadi:{cy:0,ly:0}, janeu:{cy:0,ly:0}, namkaran:{cy:0,ly:0}, grihaPravesh:{cy:0,ly:0},
+    datesCY:[], datesLY:[], blockout:"Shraadh / Pitru Paksha" },
+  Oct: { shaadi:{cy:7,ly:5}, janeu:{cy:2,ly:2}, namkaran:{cy:3,ly:3}, grihaPravesh:{cy:4,ly:3},
+    datesCY:["27","28","30","31"], datesLY:["28","30"] },
+  Nov: { shaadi:{cy:13,ly:11}, janeu:{cy:4,ly:3}, namkaran:{cy:5,ly:4}, grihaPravesh:{cy:6,ly:5},
+    datesCY:["02","03","06","08","12","13","16","17","21","22","25","27","30"],
+    datesLY:["12","13","16","17","18","22","23","25","28","29","30"] },
+  Dec: { shaadi:{cy:9,ly:10}, janeu:{cy:2,ly:2}, namkaran:{cy:3,ly:3}, grihaPravesh:{cy:4,ly:4},
+    datesCY:["02","04","05","06","09","10","11","14","15"],
+    datesLY:["04","05","09","10","11","13","14","15","16","17"], blockout:"Kharmas" },
+};
+
+export const SALE_TAGLINES_DEFAULTS: Record<MonthKey, string> = {
+  Jan: "Amazon: 'Republic Day Mega Deals' · Flipkart: 'Big Saving Days' · Myntra: 'EORS Winter — Up to 80% off'",
+  Feb: "Nykaa: 'Love is in the Cart' · Amazon: 'Valentine Store — Gifts they'll love'",
+  Mar: "Amazon: 'Holi Hai — Rang Barse Deals' · Meesho: 'Holi Bash — Lowest Prices Ever'",
+  Apr: "Amazon: 'Summer Sale — Cool Deals' · Flipkart: 'Big Summer Sale'",
+  May: "Tanishq: 'Akshaya Tritiya — Pure Gold, Pure Joy' · Nykaa: 'Hot Pink Sale'",
+  Jun: "Zepto: 'Monsoon Mania — 10 min delivery' · Amazon: 'Father's Day Store'",
+  Jul: "Amazon: 'Prime Day — Members only' · Flipkart: 'GOAT Sale — Greatest of All Time'",
+  Aug: "Amazon: 'Freedom Sale — Azadi ke Offers' · Flipkart: 'Independence Sale'",
+  Sep: "Amazon: 'GIF teaser — biggest sale loading' · Flipkart: 'BBD Early Access for Plus'",
+  Oct: "Amazon: 'Great Indian Festival — Sabse bada sale' · Flipkart: 'Big Billion Days' · Meesho: 'Mega Blockbuster'",
+  Nov: "Nykaa: 'Pink Friday — Beauty Bonanza' · Ajio: 'All Stars Sale' · Swiggy: 'Match Day Mania'",
+  Dec: "Amazon: 'Year-End Sale — Naya Saal, Naye Deals' · Myntra: 'EORS Festive'",
+};
+
+export interface ImportRow { name: string; cy: number; py: number; }
+export const ELECTRONICS_IMPORTS: ImportRow[] = [
+  { name:"Smartphones & Mobile Handsets",         cy:1180, py:1042 },
+  { name:"Tablets & Handheld Devices",            cy:142,  py:121 },
+  { name:"PCs & Laptops",                         cy:385,  py:342 },
+  { name:"Smart Wearables (Watches/Trackers)",    cy:96,   py:71  },
+  { name:"Audio Devices (Headphones/TWS)",        cy:158,  py:138 },
+];
+
+export const MACRO_SIGNALS_V2 = [
+  { key:"genInf",  label:"General Inflation Rate (WPI %)",      cm:2.4,  pm:2.7,  unit:"%" },
+  { key:"cpi",     label:"Retail Inflation Rate (CPI %)",       cm:4.9,  pm:5.1,  unit:"%" },
+  { key:"foodInf", label:"Food Inflation Index",                cm:6.2,  pm:6.8,  unit:"%" },
+  { key:"petrol",  label:"Petrol Avg (₹/L, Delhi)",             cm:96.7, pm:96.2, unit:"₹" },
+  { key:"diesel",  label:"Diesel Avg (₹/L, Delhi)",             cm:89.6, pm:89.3, unit:"₹" },
+  { key:"upi",     label:"UPI Txn Volume (Bn)",                 cm:18.4, pm:17.9, unit:"Bn" },
+  { key:"cc",      label:"Credit Card Spends (₹ Lakh Cr)",      cm:1.82, pm:1.78, unit:"₹L Cr" },
+  { key:"repo",    label:"RBI Repo Rate %",                     cm:6.25, pm:6.25, unit:"%" },
+];
+
+export interface SimilarwebRow {
+  platform: string; visits: number; mom: number; duration: string; bounce: number;
+}
+export const SIMILARWEB_DATA: SimilarwebRow[] = [
+  { platform:"Amazon India",     visits:380.2, mom: 2.1, duration:"06:45", bounce:34.2 },
+  { platform:"Flipkart",         visits:295.7, mom:-1.4, duration:"07:12", bounce:32.8 },
+  { platform:"Shopsy",           visits: 48.6, mom: 5.3, duration:"04:18", bounce:42.5 },
+  { platform:"Myntra",           visits:142.9, mom: 3.7, duration:"08:24", bounce:28.6 },
+  { platform:"Ajio",             visits: 78.4, mom:-2.2, duration:"06:51", bounce:35.1 },
+  { platform:"Zepto",            visits: 62.1, mom: 8.9, duration:"05:32", bounce:30.2 },
+  { platform:"Blinkit",          visits: 71.5, mom: 6.4, duration:"05:48", bounce:29.7 },
+  { platform:"Swiggy Instamart", visits: 55.8, mom: 4.1, duration:"05:21", bounce:31.5 },
+];
+
+export interface FeedItem { date: string; vertical: "Horizontal" | "Quick Commerce" | "Fashion" | "Meesho"; headline: string; source: string; }
+export const MOCK_FEED: FeedItem[] = [
+  { date:"18 Jun 26", vertical:"Horizontal",     headline:"Amazon India revamps Prime Lite tier with sharper Tier-3 push", source:"ET Retail" },
+  { date:"15 Jun 26", vertical:"Horizontal",     headline:"Flipkart pilots same-day fashion in 6 metros, eyes Myntra overlap", source:"Mint" },
+  { date:"12 Jun 26", vertical:"Quick Commerce", headline:"Zepto crosses 800 dark stores; targets 1,000 by Q3", source:"Inc42" },
+  { date:"10 Jun 26", vertical:"Quick Commerce", headline:"Blinkit launches 'Bistro' — 15-min hot food delivery in Gurugram", source:"YourStory" },
+  { date:"08 Jun 26", vertical:"Quick Commerce", headline:"Swiggy Instamart adds large-format electronics SKUs to test AOV lift", source:"ET Retail" },
+  { date:"06 Jun 26", vertical:"Fashion",        headline:"Myntra Rising Star push: 40 new D2C labels onboarded for AW26 drop", source:"BoF India" },
+  { date:"04 Jun 26", vertical:"Fashion",        headline:"Ajio commits ₹400 Cr ad-spend for 'Big Bold' calendar, denim push", source:"afaqs!" },
+  { date:"02 Jun 26", vertical:"Meesho",         headline:"Meesho IPO DRHP refresh — flags Tier 3/4 GMV up 38% YoY", source:"Moneycontrol" },
+  { date:"30 May 26", vertical:"Meesho",         headline:"Meesho launches in-app live commerce for unbranded fashion", source:"Inc42" },
+  { date:"28 May 26", vertical:"Meesho",         headline:"Meesho slashes platform commission by 1.2pp to defend supplier base", source:"ET Retail" },
+  { date:"26 May 26", vertical:"Horizontal",     headline:"JioMart re-platforms; merges Hyperlocal + warehouse fulfilment", source:"Mint" },
+  { date:"22 May 26", vertical:"Fashion",        headline:"Nykaa Fashion bets on Western occasionwear for Q3 wedding edit", source:"BoF India" },
+];
+
+export const SEGMENT_INDICATORS: Record<string, string> = {
+  "Electronics/Smartphones":  "Apple iPhone launch cycle (Sep) · Samsung Galaxy S unpack (Jan/Feb)",
+  "Premium Electronics":      "Flagship launch windows · GIF/BBD discount layering",
+  "Laptops/Computers":        "Back-to-school PC refresh · WFH/RTO swing",
+  "Apparel":                  "AW (Aug-Oct) / SS (Feb-Apr) drops · Lakmé / India Fashion Week",
+  "Footwear":                 "AW/SS launches · sports performance drops",
+  "Beauty/BPC":               "Bridal season impact · premium wedding shopping windows",
+  "Grocery/Staples":          "Agri harvest arrivals · wholesale Mandi price variance",
+  "Fresh Produce":            "Harvest arrival cycles · mandi spreads vs retail",
+  "Meat":                     "Festival fast windows (Shraavan/Navratri) suppress demand",
+  "Home Decor":               "Post-wedding home settlement · auspicious Vastu dates",
+  "Kitchen Appliances":       "Wedding-gift load · Akshaya Tritiya & Dhanteras",
+  "Toys":                     "Children's Day (Nov 14) spike · exam-vacation windows",
+  "Fitness/Sports Gear":      "Jan New-Year resolution gym spikes · IPL fan merch trends",
+  "Prepared Food Delivery":   "IPL live match night load · exam dips · RTO seasonality",
+  "Instant Snacks":           "Rain spikes · corporate Monday Blues · late-night Q-com",
+  "Medicines":                "AQI spikes · seasonal flu · chronic refill cadence",
+  "Pet Care":                 "Subscription replenishment · urban premiumisation",
+  "Office Supplies":          "Fiscal-year close (Mar) · school session start (Jun)",
+};
+
+export function predictOutlook(month: MonthKey, cat: string): "Up" | "Flat" | "Down" {
+  const density = FESTIVE_DENSITY[month] ?? 0;
+  const sales = (SALE_EVENTS[month] ?? []).length;
+  let score = density + sales;
+  const inflatedQ4 = (month === "Oct" || month === "Nov");
+  if (cat.startsWith("Electronics") && (month === "Sep" || month === "Oct")) score += 4;
+  if (cat === "Premium Electronics" && inflatedQ4) score += 3;
+  if (cat === "Apparel" && inflatedQ4) score += 3;
+  if (cat === "Footwear" && inflatedQ4) score += 2;
+  if (cat === "Beauty/BPC" && (month === "Nov" || month === "Dec" || month === "Oct")) score += 3;
+  if (cat === "Toys" && month === "Nov") score += 5;
+  if ((cat === "Home Decor" || cat === "Kitchen Appliances") && (month === "May" || month === "Nov")) score += 4;
+  if (cat === "Fitness/Sports Gear" && month === "Jan") score += 5;
+  if (cat === "Prepared Food Delivery" && (month === "Apr" || month === "May" || month === "Nov")) score += 2;
+  if (cat === "Instant Snacks" && (month === "Jun" || month === "Jul")) score += 2;
+  if (cat === "Fresh Produce" && (month === "Jul" || month === "Aug")) score -= 3;
+  if (cat === "Grocery/Staples" && month === "Sep") score -= 2;
+  if (score >= 14) return "Up";
+  if (score <= 6) return "Down";
+  return "Flat";
+}
