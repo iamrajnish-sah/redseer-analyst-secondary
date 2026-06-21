@@ -35,7 +35,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navItems = [
     { to: "/", label: "Dashboard Overview", match: pathname === "/" },
     { to: "/month/Oct", label: "Month Details", match: pathname.startsWith("/month") },
-    { to: "/muhurat", label: "Muhurat Calendar", match: pathname === "/muhurat" },
+    { to: "/upload-hub", label: "Upload Hub & Ingestion Feed", match: pathname === "/upload-hub" },
+    { to: "/similarweb", label: "Similarweb Traffic Data", match: pathname === "/similarweb" },
     { to: "/reference", label: "Reference Library", match: pathname === "/reference" },
   ];
 
