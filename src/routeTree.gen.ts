@@ -10,18 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReferenceRouteImport } from './routes/reference'
-import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
 
 const ReferenceRoute = ReferenceRouteImport.update({
   id: '/reference',
   path: '/reference',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MuhuratRoute = MuhuratRouteImport.update({
-  id: '/muhurat',
-  path: '/muhurat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,34 +31,30 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/muhurat' | '/reference' | '/month/$month'
+  fullPaths: '/' | '/reference' | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/muhurat' | '/reference' | '/month/$month'
-  id: '__root__' | '/' | '/muhurat' | '/reference' | '/month/$month'
+  to: '/' | '/reference' | '/month/$month'
+  id: '__root__' | '/' | '/reference' | '/month/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MuhuratRoute: typeof MuhuratRoute
   ReferenceRoute: typeof ReferenceRoute
   MonthMonthRoute: typeof MonthMonthRoute
 }
@@ -76,13 +66,6 @@ declare module '@tanstack/react-router' {
       path: '/reference'
       fullPath: '/reference'
       preLoaderRoute: typeof ReferenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/muhurat': {
-      id: '/muhurat'
-      path: '/muhurat'
-      fullPath: '/muhurat'
-      preLoaderRoute: typeof MuhuratRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,20 +87,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MuhuratRoute: MuhuratRoute,
   ReferenceRoute: ReferenceRoute,
   MonthMonthRoute: MonthMonthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
