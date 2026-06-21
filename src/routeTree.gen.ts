@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadHubRouteImport } from './routes/upload-hub'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
 
+const UploadHubRoute = UploadHubRouteImport.update({
+  id: '/upload-hub',
+  path: '/upload-hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReferenceRoute = ReferenceRouteImport.update({
   id: '/reference',
   path: '/reference',
@@ -32,35 +38,46 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reference' | '/month/$month'
+  fullPaths: '/' | '/reference' | '/upload-hub' | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reference' | '/month/$month'
-  id: '__root__' | '/' | '/reference' | '/month/$month'
+  to: '/' | '/reference' | '/upload-hub' | '/month/$month'
+  id: '__root__' | '/' | '/reference' | '/upload-hub' | '/month/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ReferenceRoute: typeof ReferenceRoute
+  UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload-hub': {
+      id: '/upload-hub'
+      path: '/upload-hub'
+      fullPath: '/upload-hub'
+      preLoaderRoute: typeof UploadHubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reference': {
       id: '/reference'
       path: '/reference'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ReferenceRoute: ReferenceRoute,
+  UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
 }
 export const routeTree = rootRouteImport
