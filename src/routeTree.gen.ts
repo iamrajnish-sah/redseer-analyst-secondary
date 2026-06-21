@@ -9,19 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadHubRouteImport } from './routes/upload-hub'
+import { Route as SimilarwebRouteImport } from './routes/similarweb'
 import { Route as ReferenceRouteImport } from './routes/reference'
-import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
 
+const UploadHubRoute = UploadHubRouteImport.update({
+  id: '/upload-hub',
+  path: '/upload-hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SimilarwebRoute = SimilarwebRouteImport.update({
+  id: '/similarweb',
+  path: '/similarweb',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReferenceRoute = ReferenceRouteImport.update({
   id: '/reference',
   path: '/reference',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MuhuratRoute = MuhuratRouteImport.update({
-  id: '/muhurat',
-  path: '/muhurat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,52 +43,74 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/muhurat': typeof MuhuratRoute
   '/reference': typeof ReferenceRoute
+  '/similarweb': typeof SimilarwebRoute
+  '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/muhurat' | '/reference' | '/month/$month'
+  fullPaths:
+    | '/'
+    | '/reference'
+    | '/similarweb'
+    | '/upload-hub'
+    | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/muhurat' | '/reference' | '/month/$month'
-  id: '__root__' | '/' | '/muhurat' | '/reference' | '/month/$month'
+  to: '/' | '/reference' | '/similarweb' | '/upload-hub' | '/month/$month'
+  id:
+    | '__root__'
+    | '/'
+    | '/reference'
+    | '/similarweb'
+    | '/upload-hub'
+    | '/month/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MuhuratRoute: typeof MuhuratRoute
   ReferenceRoute: typeof ReferenceRoute
+  SimilarwebRoute: typeof SimilarwebRoute
+  UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload-hub': {
+      id: '/upload-hub'
+      path: '/upload-hub'
+      fullPath: '/upload-hub'
+      preLoaderRoute: typeof UploadHubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/similarweb': {
+      id: '/similarweb'
+      path: '/similarweb'
+      fullPath: '/similarweb'
+      preLoaderRoute: typeof SimilarwebRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reference': {
       id: '/reference'
       path: '/reference'
       fullPath: '/reference'
       preLoaderRoute: typeof ReferenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/muhurat': {
-      id: '/muhurat'
-      path: '/muhurat'
-      fullPath: '/muhurat'
-      preLoaderRoute: typeof MuhuratRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,8 +132,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MuhuratRoute: MuhuratRoute,
   ReferenceRoute: ReferenceRoute,
+  SimilarwebRoute: SimilarwebRoute,
+  UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
 }
 export const routeTree = rootRouteImport

@@ -17,7 +17,7 @@ function densityCell(d: number) {
   const opacity = Math.min(1, 0.18 + d * 0.075);
   return {
     backgroundColor: `color-mix(in oklab, var(--color-gold) ${opacity * 100}%, transparent)`,
-    color: d >= 7 ? "var(--color-background)" : "var(--color-foreground)",
+    color: "var(--color-foreground)",
   };
 }
 

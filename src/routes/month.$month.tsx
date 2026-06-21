@@ -1,12 +1,12 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { AppShell, Panel, Delta } from "@/components/AppShell";
 import {
-  MONTHS, MONTH_FULL, type MonthKey, FESTIVALS, MUHURATS, SALE_EVENTS,
-  PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS, SUPPLY_FACTORS,
-  SEASON_PROFILE,
+  MONTHS, MONTH_FULL, type MonthKey, FESTIVALS, MUHURATS_V2, SALE_EVENTS, SALE_TAGLINES_DEFAULTS,
+  PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS_V2, SUPPLY_FACTORS,
+  SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
 import { usePersistentState } from "@/lib/storage";
-import { AlertTriangle, TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/month/$month")({
   parseParams: ({ month }) => {
@@ -83,10 +83,11 @@ function MonthPage() {
   );
 }
 
-/* ------------- 1 Calendar & Festivals ------------- */
+/* ------------- 1 Calendar & Festivals (+ Academic Cycles) ------------- */
 function CalendarSection({ monthKey }: { monthKey: MonthKey }) {
   const baseline = FESTIVALS[monthKey] ?? [];
   const [rows, setRows] = usePersistentState(`fest::${monthKey}`, baseline);
+  const academic = ACADEMIC_CYCLES[monthKey] ?? [];
 
   return (
     <Panel title={`1 · Calendar & Festivals`} accent="gold">
@@ -127,21 +128,39 @@ function CalendarSection({ monthKey }: { monthKey: MonthKey }) {
           </tbody>
         </table>
       </div>
+
+      {/* Academic cycle overlay */}
+      <div className="mt-3 panel-2 px-3 py-2">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-3.5 w-3.5 text-[color:var(--color-primary)]" />
+          <span className="label-caps">Academic Cycle Overlay</span>
+        </div>
+        {academic.length === 0 ? (
+          <div className="mt-1 text-[11px] text-muted-foreground">No major school/college calendar markers for this month.</div>
+        ) : (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {academic.map(a => (
+              <span key={a} className="rounded-sm bg-[color:var(--color-primary)]/10 px-2 py-0.5 text-[11px] font-medium text-[color:var(--color-primary)] ring-1 ring-[color:var(--color-primary)]/30">
+                {a}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </Panel>
   );
 }
 
-/* ------------- 2 Muhurats ------------- */
+/* ------------- 2 Muhurats (CY vs LY side-by-side + dates grid) ------------- */
 function MuhuratSection({ monthKey }: { monthKey: MonthKey }) {
-  const baseline = MUHURATS[monthKey];
-  const [m, setM] = usePersistentState(`muh::${monthKey}`, baseline);
+  const baseline = MUHURATS_V2[monthKey];
+  const [m, setM] = usePersistentState(`muh2::${monthKey}`, baseline);
 
-  const fields: Array<{ key: keyof typeof m; label: string }> = [
-    { key:"shaadi", label:"Shaadi (Wedding)" },
-    { key:"janeu", label:"Janeu (Thread)" },
-    { key:"namkaran", label:"Namkaran" },
+  const counts: Array<{ key: "shaadi"|"janeu"|"namkaran"|"grihaPravesh"; label: string }> = [
+    { key:"shaadi",       label:"Shaadi (Wedding)" },
+    { key:"janeu",        label:"Janeu (Thread)" },
+    { key:"namkaran",     label:"Namkaran" },
     { key:"grihaPravesh", label:"Griha Pravesh" },
-    { key:"annaprashan", label:"Annaprashan" },
   ];
 
   return (
@@ -150,32 +169,73 @@ function MuhuratSection({ monthKey }: { monthKey: MonthKey }) {
         <div className="mb-3 flex items-start gap-2 rounded-sm border border-[color:var(--color-risk)]/60 bg-[color:var(--color-risk)]/10 px-3 py-2 text-xs">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--color-risk)]" />
           <div>
-            <div className="font-bold tracking-wide text-[color:var(--color-risk)] uppercase">⚠️ Inauspicious Window Detected — {m.blockout}</div>
-            <div className="mt-0.5 text-muted-foreground">Discretionary FMCG & retail spend traditionally paused. Verify with primary telemetry before sizing.</div>
+            <div className="font-bold tracking-wide text-[color:var(--color-risk)] uppercase">⚠️ Inauspicious Window — {m.blockout}</div>
+            <div className="mt-0.5 text-muted-foreground">Discretionary FMCG & retail spend traditionally paused. Verify with primary telemetry.</div>
           </div>
         </div>
       )}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {fields.map(f => (
-          <label key={String(f.key)} className="panel-2 flex flex-col gap-1 px-3 py-2">
-            <span className="label-caps">{f.label}</span>
-            <input
-              type="number"
-              min={0}
-              value={m[f.key] as number}
-              onChange={(e) => setM({ ...m, [f.key]: Number(e.target.value) })}
-              className="num bg-transparent text-lg font-bold focus:outline-hidden"
-            />
-          </label>
-        ))}
+
+      <div className="grid grid-cols-2 gap-2">
+        {counts.map(f => {
+          const cy = m[f.key].cy; const ly = m[f.key].ly;
+          const diff = cy - ly;
+          const cls = diff > 0 ? "text-[color:var(--color-up)]" : diff < 0 ? "text-[color:var(--color-down)]" : "text-[color:var(--color-flat)]";
+          return (
+            <div key={f.key} className="panel-2 px-3 py-2">
+              <div className="label-caps">{f.label}</div>
+              <div className="mt-1 flex items-baseline gap-2">
+                <input
+                  type="number" min={0} value={cy}
+                  onChange={(e) => setM({ ...m, [f.key]: { ...m[f.key], cy: Number(e.target.value) } })}
+                  className="num w-12 bg-transparent text-xl font-bold focus:outline-hidden"
+                />
+                <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Days CY</span>
+                <span className="text-muted-foreground">vs</span>
+                <input
+                  type="number" min={0} value={ly}
+                  onChange={(e) => setM({ ...m, [f.key]: { ...m[f.key], ly: Number(e.target.value) } })}
+                  className="num w-12 bg-transparent text-base font-semibold text-muted-foreground focus:outline-hidden"
+                />
+                <span className="text-[10px] tracking-wider text-muted-foreground uppercase">LY</span>
+                <span className={`ml-auto num text-xs font-semibold ${cls}`}>{diff > 0 ? `+${diff}` : diff}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Comparative dates grid */}
+      <div className="mt-3 panel-2 px-3 py-2">
+        <div className="label-caps mb-1.5">Comparative Wedding Muhurat Dates · {MONTH_FULL[monthKey]}</div>
+        <div className="grid grid-cols-2 gap-3 text-[11px]">
+          <div>
+            <div className="text-muted-foreground">2025 (CY) · {m.datesCY.length} dates</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {m.datesCY.length === 0 && <span className="text-muted-foreground">—</span>}
+              {m.datesCY.map(d => (
+                <span key={d} className="num rounded-sm bg-[color:var(--color-up)]/12 px-1.5 py-0.5 font-semibold text-[color:var(--color-up)] ring-1 ring-[color:var(--color-up)]/30">{d}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">2024 (LY) · {m.datesLY.length} dates</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {m.datesLY.length === 0 && <span className="text-muted-foreground">—</span>}
+              {m.datesLY.map(d => (
+                <span key={d} className="num rounded-sm bg-[color:var(--color-flat)]/15 px-1.5 py-0.5 font-medium text-muted-foreground ring-1 ring-border">{d}</span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Panel>
   );
 }
 
-/* ------------- 3 Platform Sale Events ------------- */
+/* ------------- 3 Platform Sale Events + Tagline Tracker ------------- */
 function PlatformSaleSection({ monthKey }: { monthKey: MonthKey }) {
   const [rows] = usePersistentState(`sales::${monthKey}`, SALE_EVENTS[monthKey] ?? []);
+  const [tagline, setTagline] = usePersistentState(`tagline::${monthKey}`, SALE_TAGLINES_DEFAULTS[monthKey] ?? "");
   return (
     <Panel title="3 · Platform Sale Events" accent="teal">
       <div className="space-y-1.5">
@@ -187,6 +247,18 @@ function PlatformSaleSection({ monthKey }: { monthKey: MonthKey }) {
             <div className="num text-muted-foreground">{s.window}</div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-3 panel-2 px-3 py-2">
+        <label className="label-caps">Ad Campaign Tagline / Punchline Tracker</label>
+        <textarea
+          value={tagline}
+          onChange={(e) => setTagline(e.target.value)}
+          rows={3}
+          placeholder="Log specific slogans run by platforms this month — e.g. 'Sabse bada sale', 'Pink Friday', etc."
+          className="mt-1 w-full resize-y rounded-sm bg-transparent text-xs leading-relaxed focus:outline-hidden"
+        />
+        <div className="mt-1 text-[10px] text-muted-foreground">Tracks promotion aggression beyond standard sale dates.</div>
       </div>
     </Panel>
   );
@@ -324,78 +396,152 @@ function PlatformMatrix({ monthKey, vertical, platforms }: { monthKey: MonthKey;
   );
 }
 
-/* ------------- 6 Category Grid ------------- */
+/* ------------- 6 Category Grid + Predictive Outlook ------------- */
 function CategoryGridSection({ monthKey }: { monthKey: MonthKey }) {
   const init: Record<string, Trend> = Object.fromEntries(CATEGORIES_18.map(c => [c, "Flat" as Trend]));
   const [data, setData] = usePersistentState(`cat::${monthKey}`, init);
   const cycle = (t: Trend): Trend => (t === "Up" ? "Down" : t === "Down" ? "Flat" : "Up");
+
   return (
-    <Panel title="6 · Category Performance Grid (18 Sectors)" accent="primary" className="mt-4">
-      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {CATEGORIES_18.map(c => {
-          const t = data[c];
-          const Icon = t === "Up" ? TrendingUp : t === "Down" ? TrendingDown : Minus;
-          const cls = t === "Up" ? "text-[color:var(--color-up)] ring-[color:var(--color-up)]/40" :
-                      t === "Down" ? "text-[color:var(--color-down)] ring-[color:var(--color-down)]/40" :
-                      "text-[color:var(--color-flat)] ring-[color:var(--color-border)]";
-          return (
-            <button
-              key={c}
-              onClick={()=>setData({ ...data, [c]: cycle(t) })}
-              className={`panel-2 flex items-center justify-between gap-2 px-2 py-1.5 text-left text-[11px] font-medium ring-1 ${cls}`}
-            >
-              <span className="truncate">{c}</span>
-              <Icon className="h-3.5 w-3.5 shrink-0" />
-            </button>
-          );
-        })}
+    <Panel title="6 · Category Performance Grid + Secondary Predictive Outlook" accent="primary" className="mt-4">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[860px] text-xs">
+          <thead className="text-muted-foreground">
+            <tr>
+              <th className="label-caps border-b border-border px-3 py-1.5 text-left">Category</th>
+              <th className="label-caps border-b border-border px-3 py-1.5 text-left">Segment-Specific Indicator</th>
+              <th className="label-caps border-b border-border px-3 py-1.5 text-center">Analyst Direction</th>
+              <th className="label-caps border-b border-border px-3 py-1.5 text-center">Secondary Predictive Outlook</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CATEGORIES_18.map(c => {
+              const t = data[c];
+              const Icon = t === "Up" ? TrendingUp : t === "Down" ? TrendingDown : Minus;
+              const tCls = t === "Up" ? "text-[color:var(--color-up)] ring-[color:var(--color-up)]/40" :
+                          t === "Down" ? "text-[color:var(--color-down)] ring-[color:var(--color-down)]/40" :
+                          "text-[color:var(--color-flat)] ring-border";
+              const outlook = predictOutlook(monthKey, c);
+              const oMeta =
+                outlook === "Up"   ? { sym: "▲", label: "Expected Growth",  cls: "text-[color:var(--color-up)] bg-[color:var(--color-up)]/10 ring-[color:var(--color-up)]/40" } :
+                outlook === "Down" ? { sym: "▼", label: "Expected Decline", cls: "text-[color:var(--color-down)] bg-[color:var(--color-down)]/10 ring-[color:var(--color-down)]/40" } :
+                                     { sym: "▶", label: "Expected Flat",    cls: "text-[color:var(--color-flat)] bg-[color:var(--color-flat)]/10 ring-border" };
+              return (
+                <tr key={c} className="row-hover border-b border-border">
+                  <td className="px-3 py-1.5 font-semibold">{c}</td>
+                  <td className="px-3 py-1.5 text-[11px] text-muted-foreground">
+                    {SEGMENT_INDICATORS[c] ?? <span className="text-muted-foreground/70">—</span>}
+                  </td>
+                  <td className="px-3 py-1.5 text-center">
+                    <button
+                      onClick={() => setData({ ...data, [c]: cycle(t) })}
+                      className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 text-[11px] font-semibold ring-1 ${tCls}`}
+                      title="Click to cycle Up → Down → Flat"
+                    >
+                      <Icon className="h-3 w-3" /> {t}
+                    </button>
+                  </td>
+                  <td className="px-3 py-1.5 text-center">
+                    <span className={`inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[11px] font-semibold ring-1 ${oMeta.cls}`}>
+                      {oMeta.sym} {oMeta.label}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <p className="mt-2 text-[10px] text-muted-foreground">Click a tile to cycle Up → Down → Flat.</p>
+      <p className="mt-2 text-[10px] text-muted-foreground">
+        Outlook combines festive density, active sale clusters, MoM inflation pressure and category-specific bias. Use it as a secondary
+        sanity-check — not as a verdict — against your primary expert numbers.
+      </p>
     </Panel>
   );
 }
 
-/* ------------- 7 Macro Signals ------------- */
+/* ------------- 7 Macro & Consumer Signals — MoM + split inflation + Electronics Imports ------------- */
 function MacroSection({ monthKey }: { monthKey: MonthKey }) {
-  const init = Object.fromEntries(MACRO_SIGNALS.map(s => [s.key, { cy: Number(s.cy), ly: Number(s.ly) }]));
-  const [data, setData] = usePersistentState(`macro::${monthKey}`, init);
+  const init = Object.fromEntries(MACRO_SIGNALS_V2.map(s => [s.key, { cm: Number(s.cm), pm: Number(s.pm) }]));
+  const [data, setData] = usePersistentState(`macro2::${monthKey}`, init);
+  const [imports, setImports] = usePersistentState(`imports::${monthKey}`, ELECTRONICS_IMPORTS);
   return (
-    <Panel title="7 · Macro & Consumer Signals" accent="primary">
+    <Panel title="7 · Macro & Consumer Trends (MoM)" accent="primary">
       <table className="w-full text-xs">
         <thead className="text-muted-foreground">
           <tr>
             <th className="label-caps border-b border-border px-2 py-1.5 text-left">Indicator</th>
-            <th className="label-caps border-b border-border px-2 py-1.5 text-right">CY</th>
-            <th className="label-caps border-b border-border px-2 py-1.5 text-right">LY</th>
-            <th className="label-caps border-b border-border px-2 py-1.5 text-right">Δ YoY</th>
+            <th className="label-caps border-b border-border px-2 py-1.5 text-right">Current Month</th>
+            <th className="label-caps border-b border-border px-2 py-1.5 text-right">Prev Month</th>
+            <th className="label-caps border-b border-border px-2 py-1.5 text-right">Δ MoM</th>
           </tr>
         </thead>
         <tbody>
-          {MACRO_SIGNALS.map(s => {
+          {MACRO_SIGNALS_V2.map(s => {
             const v = data[s.key];
             return (
               <tr key={s.key} className="row-hover border-b border-border">
                 <td className="px-2 py-1.5 font-medium">{s.label}</td>
                 <td className="px-2 py-1.5 text-right">
                   <input
-                    type="number" step={0.01} value={v.cy}
-                    onChange={(e)=>setData({ ...data, [s.key]: { ...v, cy: Number(e.target.value) } })}
+                    type="number" step={0.01} value={v.cm}
+                    onChange={(e) => setData({ ...data, [s.key]: { ...v, cm: Number(e.target.value) } })}
                     className="num w-20 bg-transparent text-right focus:outline-hidden"
                   />
                 </td>
                 <td className="px-2 py-1.5 text-right">
                   <input
-                    type="number" step={0.01} value={v.ly}
-                    onChange={(e)=>setData({ ...data, [s.key]: { ...v, ly: Number(e.target.value) } })}
+                    type="number" step={0.01} value={v.pm}
+                    onChange={(e) => setData({ ...data, [s.key]: { ...v, pm: Number(e.target.value) } })}
                     className="num w-20 bg-transparent text-right text-muted-foreground focus:outline-hidden"
                   />
                 </td>
-                <td className="px-2 py-1.5 text-right"><Delta cy={v.cy} ly={v.ly} suffix={s.unit ? ` ${s.unit}` : ""} /></td>
+                <td className="px-2 py-1.5 text-right"><Delta cy={v.cm} ly={v.pm} suffix={s.unit ? ` ${s.unit}` : ""} /></td>
               </tr>
             );
           })}
         </tbody>
       </table>
+
+      {/* Electronics Imports Sub-Grid */}
+      <div className="mt-4 panel-2 overflow-hidden">
+        <header className="border-b border-border px-3 py-1.5">
+          <h4 className="label-caps text-[color:var(--color-teal)]">Electronics Import Sub-Grid · Customs Data (USD Millions)</h4>
+        </header>
+        <table className="w-full text-xs">
+          <thead className="text-muted-foreground">
+            <tr>
+              <th className="label-caps px-3 py-1.5 text-left">Category</th>
+              <th className="label-caps px-3 py-1.5 text-right">CY (USD M)</th>
+              <th className="label-caps px-3 py-1.5 text-right">PY (USD M)</th>
+              <th className="label-caps px-3 py-1.5 text-right">Δ YoY</th>
+            </tr>
+          </thead>
+          <tbody>
+            {imports.map((r, i) => (
+              <tr key={r.name} className="row-hover border-t border-border">
+                <td className="px-3 py-1.5 font-medium">{r.name}</td>
+                <td className="px-3 py-1.5 text-right">
+                  <input
+                    type="number" value={r.cy}
+                    onChange={(e) => { const n = [...imports]; n[i] = { ...r, cy: Number(e.target.value) }; setImports(n); }}
+                    className="num w-20 bg-transparent text-right focus:outline-hidden"
+                  />
+                </td>
+                <td className="px-3 py-1.5 text-right">
+                  <input
+                    type="number" value={r.py}
+                    onChange={(e) => { const n = [...imports]; n[i] = { ...r, py: Number(e.target.value) }; setImports(n); }}
+                    className="num w-20 bg-transparent text-right text-muted-foreground focus:outline-hidden"
+                  />
+                </td>
+                <td className="px-3 py-1.5 text-right"><Delta cy={r.cy} ly={r.py} suffix=" M" /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="px-3 py-1.5 text-[10px] text-muted-foreground">Source: Govt of India customs / DGCI&amp;S monthly imports — edit to match latest pull.</p>
+      </div>
     </Panel>
   );
 }
