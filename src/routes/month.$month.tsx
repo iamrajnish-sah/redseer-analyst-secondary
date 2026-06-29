@@ -290,6 +290,20 @@ function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
       {/* City switcher + month summary */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="label-caps mr-1">Metro City</span>
+        <span
+          title="Source: Open-Meteo Archive API (ERA5 reanalysis). 2025 vs 2024 daily means."
+          className={`rounded-sm px-1.5 py-0.5 text-[10px] font-semibold tracking-wide ${
+            isLoading
+              ? "bg-[color:var(--color-flat)]/15 text-muted-foreground"
+              : source === "live"
+                ? "bg-[color:var(--color-up)]/10 text-[color:var(--color-up)]"
+                : source === "mixed"
+                  ? "bg-[color:var(--color-gold)]/15 text-[color:var(--color-gold)]"
+                  : "bg-[color:var(--color-flat)]/15 text-muted-foreground"
+          }`}
+        >
+          {isLoading ? "LOADING…" : isFetching ? "REFRESHING" : source === "live" ? "● LIVE" : source === "mixed" ? "PARTIAL" : "FALLBACK"}
+        </span>
         <div className="flex flex-wrap gap-1">
           {METRO_CITIES.map(c => (
             <button
