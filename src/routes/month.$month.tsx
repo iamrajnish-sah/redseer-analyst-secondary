@@ -5,7 +5,8 @@ import {
   PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS_V2, SUPPLY_FACTORS,
   SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
-import { METRO_CITIES, type MetroCity, climateSeries, metroMonthlySummary } from "@/lib/climate";
+import { METRO_CITIES, type MetroCity } from "@/lib/climate";
+import { useClimateData } from "@/lib/useClimateData";
 import { usePersistentState } from "@/lib/storage";
 import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -276,8 +277,7 @@ function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
     aqi: 180,
   });
 
-  const series = climateSeries(city, monthKey);
-  const summary = metroMonthlySummary(monthKey);
+  const { series, summary, isLoading, isFetching, source } = useClimateData(monthKey, city);
   const cityRow = summary.find(s => s.city === city)!;
   const longName = MONTH_FULL[monthKey];
 
@@ -290,6 +290,20 @@ function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
       {/* City switcher + month summary */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="label-caps mr-1">Metro City</span>
+        <span
+          title="Source: Open-Meteo Archive API (ERA5 reanalysis). 2025 vs 2024 daily means."
+          className={`rounded-sm px-1.5 py-0.5 text-[10px] font-semibold tracking-wide ${
+            isLoading
+              ? "bg-[color:var(--color-flat)]/15 text-muted-foreground"
+              : source === "live"
+                ? "bg-[color:var(--color-up)]/10 text-[color:var(--color-up)]"
+                : source === "mixed"
+                  ? "bg-[color:var(--color-gold)]/15 text-[color:var(--color-gold)]"
+                  : "bg-[color:var(--color-flat)]/15 text-muted-foreground"
+          }`}
+        >
+          {isLoading ? "LOADING…" : isFetching ? "REFRESHING" : source === "live" ? "● LIVE" : source === "mixed" ? "PARTIAL" : "FALLBACK"}
+        </span>
         <div className="flex flex-wrap gap-1">
           {METRO_CITIES.map(c => (
             <button
