@@ -5,8 +5,10 @@ import {
   PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS_V2, SUPPLY_FACTORS,
   SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
+import { METRO_CITIES, type MetroCity, climateSeries, metroMonthlySummary } from "@/lib/climate";
 import { usePersistentState } from "@/lib/storage";
 import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export const Route = createFileRoute("/month/$month")({
   parseParams: ({ month }) => {
