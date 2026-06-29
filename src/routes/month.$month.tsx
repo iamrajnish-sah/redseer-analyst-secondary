@@ -276,8 +276,7 @@ function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
     aqi: 180,
   });
 
-  const series = climateSeries(city, monthKey);
-  const summary = metroMonthlySummary(monthKey);
+  const { series, summary, isLoading, isFetching, source } = useClimateData(monthKey, city);
   const cityRow = summary.find(s => s.city === city)!;
   const longName = MONTH_FULL[monthKey];
 
