@@ -269,35 +269,152 @@ function PlatformSaleSection({ monthKey }: { monthKey: MonthKey }) {
 
 /* ------------- 4 Weather & Climate ------------- */
 function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
+  const [city, setCity] = usePersistentState<MetroCity>(`weatherCity::${monthKey}`, "Delhi");
   const [w, setW] = usePersistentState(`weather::${monthKey}`, {
-    tempDev: 0.4,
-    rainfallCY: 0,
-    rainfallLY: 0,
     monsoonOnsetDelay: 0,
     arrivalSpeed: "Normal" as "Early" | "Normal" | "Delayed",
     aqi: 180,
   });
-  const fields = [
-    { label:"Avg Temp Deviation vs LY (°C)", key:"tempDev", step:0.1 },
-    { label:"Rainfall (mm) CY", key:"rainfallCY", step:1 },
-    { label:"Rainfall (mm) LY", key:"rainfallLY", step:1 },
-    { label:"Monsoon Onset/Withdraw Δ (days)", key:"monsoonOnsetDelay", step:1 },
-    { label:"Avg AQI (Tier-1 Metros)", key:"aqi", step:1 },
-  ] as const;
+
+  const series = climateSeries(city, monthKey);
+  const summary = metroMonthlySummary(monthKey);
+  const cityRow = summary.find(s => s.city === city)!;
+  const longName = MONTH_FULL[monthKey];
+
+  const PRIMARY = "var(--color-primary)";
+  const MUTED = "var(--color-flat)";
+  const TEAL = "var(--color-teal)";
+
   return (
-    <Panel title="4 · Weather & Climate" accent="primary">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {fields.map(f => (
-          <label key={f.key} className="panel-2 flex flex-col gap-1 px-3 py-2">
-            <span className="label-caps">{f.label}</span>
-            <input
-              type="number" step={f.step}
-              value={(w as Record<string,number|string>)[f.key] as number}
-              onChange={(e)=>setW({ ...w, [f.key]: Number(e.target.value) })}
-              className="num bg-transparent text-base font-semibold focus:outline-hidden"
-            />
-          </label>
-        ))}
+    <Panel title="4 · Weather & Climate" accent="primary" className="mt-4">
+      {/* City switcher + month summary */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="label-caps mr-1">Metro City</span>
+        <div className="flex flex-wrap gap-1">
+          {METRO_CITIES.map(c => (
+            <button
+              key={c}
+              onClick={() => setCity(c)}
+              className={`rounded-sm px-2.5 py-1 text-[11px] font-semibold tracking-wide transition ${
+                c === city
+                  ? "bg-[color:var(--color-primary)]/15 text-[color:var(--color-primary)] ring-1 ring-[color:var(--color-primary)]/60"
+                  : "panel-2 text-muted-foreground hover:text-foreground"
+              }`}
+            >{c}</button>
+          ))}
+        </div>
+        <div className="ml-auto flex gap-2 text-[11px]">
+          <div className="panel-2 px-2.5 py-1">
+            <span className="label-caps">Avg Temp CY</span>
+            <span className="num ml-1.5 font-semibold">{cityRow.avgTempCY}°C</span>
+            <Delta cy={cityRow.avgTempCY} ly={cityRow.avgTempLY} suffix="°" />
+          </div>
+          <div className="panel-2 px-2.5 py-1">
+            <span className="label-caps">Rain CY</span>
+            <span className="num ml-1.5 font-semibold">{cityRow.totalRainCY} mm</span>
+            <Delta cy={cityRow.totalRainCY} ly={cityRow.totalRainLY} suffix=" mm" />
+          </div>
+          <div className="panel-2 px-2.5 py-1">
+            <span className="label-caps">Peak Day Rain</span>
+            <span className="num ml-1.5 font-semibold">{cityRow.maxRainCY} mm</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Two charts side-by-side */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="panel-2 px-3 py-2">
+          <div className="mb-1 flex items-center justify-between">
+            <div className="label-caps">Daily Avg Temperature · {city} · {longName}</div>
+            <div className="flex gap-2 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-3 bg-[color:var(--color-primary)]" />2025</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-3 bg-[color:var(--color-flat)]" />2024</span>
+            </div>
+          </div>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={series} margin={{ top: 6, right: 8, bottom: 0, left: -16 }}>
+                <CartesianGrid strokeDasharray="2 4" stroke="var(--color-border)" />
+                <XAxis dataKey="day" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} stroke="var(--color-border)" />
+                <YAxis unit="°" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} stroke="var(--color-border)" domain={["dataMin - 1", "dataMax + 1"]} />
+                <Tooltip contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", fontSize: 11 }} />
+                <Legend wrapperStyle={{ fontSize: 10, display: "none" }} />
+                <Line type="monotone" dataKey="tempCY" name="2025" stroke={PRIMARY} strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="tempLY" name="2024" stroke={MUTED} strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="panel-2 px-3 py-2">
+          <div className="mb-1 flex items-center justify-between">
+            <div className="label-caps">Daily Rainfall (mm) · {city} · {longName}</div>
+            <div className="flex gap-2 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 bg-[color:var(--color-teal)]" />2025</span>
+              <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 bg-[color:var(--color-flat)]/60" />2024</span>
+            </div>
+          </div>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={series} margin={{ top: 6, right: 8, bottom: 0, left: -16 }}>
+                <CartesianGrid strokeDasharray="2 4" stroke="var(--color-border)" />
+                <XAxis dataKey="day" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} stroke="var(--color-border)" />
+                <YAxis unit="mm" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} stroke="var(--color-border)" />
+                <Tooltip contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", fontSize: 11 }} />
+                <Bar dataKey="rainLY" name="2024" fill={MUTED} fillOpacity={0.45} />
+                <Bar dataKey="rainCY" name="2025" fill={TEAL} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Metro city comparison table */}
+      <div className="mt-4 panel-2 overflow-hidden">
+        <header className="border-b border-border px-3 py-1.5">
+          <h4 className="label-caps">Top 8 Metro Cities · {longName} Climate Snapshot</h4>
+        </header>
+        <div className="overflow-x-auto">
+          <table className="w-full text-[11px]">
+            <thead className="text-muted-foreground">
+              <tr>
+                {["City","Avg Temp 2025","Avg Temp 2024","Δ Temp","Rain 2025 (mm)","Rain 2024 (mm)","Δ Rain","Peak Day Rain"].map(h => (
+                  <th key={h} className="label-caps px-2 py-1 text-left">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {summary.map(r => (
+                <tr
+                  key={r.city}
+                  className={`row-hover border-t border-border cursor-pointer ${r.city === city ? "bg-[color:var(--color-primary)]/5" : ""}`}
+                  onClick={() => setCity(r.city)}
+                >
+                  <td className="px-2 py-1.5 font-semibold">{r.city}</td>
+                  <td className="num px-2 py-1.5">{r.avgTempCY}°C</td>
+                  <td className="num px-2 py-1.5 text-muted-foreground">{r.avgTempLY}°C</td>
+                  <td className="px-2 py-1.5"><Delta cy={r.avgTempCY} ly={r.avgTempLY} suffix="°" /></td>
+                  <td className="num px-2 py-1.5">{r.totalRainCY}</td>
+                  <td className="num px-2 py-1.5 text-muted-foreground">{r.totalRainLY}</td>
+                  <td className="px-2 py-1.5"><Delta cy={r.totalRainCY} ly={r.totalRainLY} suffix=" mm" /></td>
+                  <td className="num px-2 py-1.5">{r.maxRainCY} mm</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Analyst fields */}
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <label className="panel-2 flex flex-col gap-1 px-3 py-2">
+          <span className="label-caps">Monsoon Onset/Withdraw Δ (days)</span>
+          <input
+            type="number" step={1} value={w.monsoonOnsetDelay}
+            onChange={(e)=>setW({ ...w, monsoonOnsetDelay: Number(e.target.value) })}
+            className="num bg-transparent text-base font-semibold focus:outline-hidden"
+          />
+        </label>
         <label className="panel-2 flex flex-col gap-1 px-3 py-2">
           <span className="label-caps">Season Arrival</span>
           <select
@@ -308,15 +425,17 @@ function WeatherSection({ monthKey }: { monthKey: MonthKey }) {
             <option>Early</option><option>Normal</option><option>Delayed</option>
           </select>
         </label>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-        <div className="panel-2 px-3 py-2">
-          <span className="label-caps">Rainfall Δ vs LY</span>
-          <div className="mt-1"><Delta cy={w.rainfallCY} ly={w.rainfallLY} suffix=" mm" /></div>
-        </div>
-        <div className="panel-2 px-3 py-2">
+        <label className="panel-2 flex flex-col gap-1 px-3 py-2">
+          <span className="label-caps">Avg AQI (Tier-1 Metros)</span>
+          <input
+            type="number" step={1} value={w.aqi}
+            onChange={(e)=>setW({ ...w, aqi: Number(e.target.value) })}
+            className="num bg-transparent text-base font-semibold focus:outline-hidden"
+          />
+        </label>
+        <div className="panel-2 flex flex-col gap-1 px-3 py-2">
           <span className="label-caps">AQI Band</span>
-          <div className="mt-1 font-semibold">
+          <div className="text-base font-semibold">
             {w.aqi < 100 ? "Moderate" : w.aqi < 200 ? "Poor" : w.aqi < 300 ? "Very Poor" : "Severe"}
           </div>
         </div>
