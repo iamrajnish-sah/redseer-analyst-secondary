@@ -6,6 +6,7 @@ import {
   SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
 import { METRO_CITIES, type MetroCity, climateSeries, metroMonthlySummary } from "@/lib/climate";
+import { useClimateData } from "@/lib/useClimateData";
 import { usePersistentState } from "@/lib/storage";
 import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
