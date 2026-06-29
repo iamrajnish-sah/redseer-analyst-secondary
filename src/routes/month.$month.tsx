@@ -5,7 +5,7 @@ import {
   PLATFORM_VERTICALS, PLATFORM_METRICS, CATEGORIES_18, MACRO_SIGNALS_V2, SUPPLY_FACTORS,
   SEASON_PROFILE, ACADEMIC_CYCLES, ELECTRONICS_IMPORTS, SEGMENT_INDICATORS, predictOutlook,
 } from "@/lib/data";
-import { METRO_CITIES, type MetroCity, climateSeries, metroMonthlySummary } from "@/lib/climate";
+import { METRO_CITIES, type MetroCity } from "@/lib/climate";
 import { useClimateData } from "@/lib/useClimateData";
 import { usePersistentState } from "@/lib/storage";
 import { AlertTriangle, TrendingDown, TrendingUp, Minus, GraduationCap } from "lucide-react";
