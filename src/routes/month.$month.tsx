@@ -63,8 +63,9 @@ function MonthPage() {
         <CalendarSection monthKey={monthKey} />
         <MuhuratSection monthKey={monthKey} />
         <PlatformSaleSection monthKey={monthKey} />
-        <WeatherSection monthKey={monthKey} />
       </div>
+
+      <WeatherSection monthKey={monthKey} />
 
       <PlatformPerformanceSection monthKey={monthKey} />
       <CategoryGridSection monthKey={monthKey} />
