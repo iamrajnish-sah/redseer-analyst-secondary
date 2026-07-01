@@ -37,6 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/month/Oct", label: "Month Details", match: pathname.startsWith("/month") },
     { to: "/upload-hub", label: "Upload Hub & Ingestion Feed", match: pathname === "/upload-hub" },
     { to: "/similarweb", label: "Similarweb Traffic Data", match: pathname === "/similarweb" },
+    { to: "/search-interest-comparison", label: "Search Interest (Google Trends)", match: pathname === "/search-interest-comparison" },
     { to: "/reference", label: "Reference Library", match: pathname === "/reference" },
   ];
 
