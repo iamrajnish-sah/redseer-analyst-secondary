@@ -39,6 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/similarweb", label: "Similarweb Traffic Data", match: pathname === "/similarweb" },
     { to: "/search-interest-comparison", label: "Search Interest (Google Trends)", match: pathname === "/search-interest-comparison" },
     { to: "/reference", label: "Reference Library", match: pathname === "/reference" },
+    { to: "/meesho-ads", label: "Meesho Ad Tracker", match: pathname === "/meesho-ads" },
   ];
 
   const activeMonth: MonthKey | null = pathname.startsWith("/month/")
