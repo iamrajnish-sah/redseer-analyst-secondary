@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadHubRouteImport } from './routes/upload-hub'
 import { Route as SimilarwebRouteImport } from './routes/similarweb'
+import { Route as SearchInterestComparisonRouteImport } from './routes/search-interest-comparison'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
@@ -25,6 +26,12 @@ const SimilarwebRoute = SimilarwebRouteImport.update({
   path: '/similarweb',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchInterestComparisonRoute =
+  SearchInterestComparisonRouteImport.update({
+    id: '/search-interest-comparison',
+    path: '/search-interest-comparison',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ReferenceRoute = ReferenceRouteImport.update({
   id: '/reference',
   path: '/reference',
@@ -44,6 +51,7 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -51,6 +59,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -59,6 +68,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/reference': typeof ReferenceRoute
+  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -68,15 +78,23 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/reference'
+    | '/search-interest-comparison'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reference' | '/similarweb' | '/upload-hub' | '/month/$month'
+  to:
+    | '/'
+    | '/reference'
+    | '/search-interest-comparison'
+    | '/similarweb'
+    | '/upload-hub'
+    | '/month/$month'
   id:
     | '__root__'
     | '/'
     | '/reference'
+    | '/search-interest-comparison'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
@@ -85,6 +103,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ReferenceRoute: typeof ReferenceRoute
+  SearchInterestComparisonRoute: typeof SearchInterestComparisonRoute
   SimilarwebRoute: typeof SimilarwebRoute
   UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
@@ -104,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/similarweb'
       fullPath: '/similarweb'
       preLoaderRoute: typeof SimilarwebRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search-interest-comparison': {
+      id: '/search-interest-comparison'
+      path: '/search-interest-comparison'
+      fullPath: '/search-interest-comparison'
+      preLoaderRoute: typeof SearchInterestComparisonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reference': {
@@ -133,6 +159,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ReferenceRoute: ReferenceRoute,
+  SearchInterestComparisonRoute: SearchInterestComparisonRoute,
   SimilarwebRoute: SimilarwebRoute,
   UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
@@ -140,13 +167,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
