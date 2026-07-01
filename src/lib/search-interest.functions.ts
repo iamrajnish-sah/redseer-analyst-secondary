@@ -27,10 +27,15 @@ let cache: CacheEntry | null = null;
 const MONTH_LABEL = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function parseSerpDate(raw: string): Date | null {
-  // SerpApi returns e.g. "Jul 7 - 13, 2024" or "Jul 2024" for monthly.
-  // Take the first date segment.
-  const cleaned = raw.replace(/\s+-\s+\d+/, ""); // strip " - 13"
-  const d = new Date(cleaned);
+  // SerpApi returns e.g. "Jun 29 – Jul 5, 2025" (en-dash) or "Jul 2024".
+  // Strip a trailing " – Mmm dd" or " - dd" range fragment before the year.
+  const yearMatch = raw.match(/(\d{4})\s*$/);
+  if (!yearMatch) return null;
+  const year = yearMatch[1];
+  const head = raw.slice(0, yearMatch.index).replace(/,\s*$/, "");
+  // Take the part before any dash (hyphen or en/em-dash)
+  const firstSegment = head.split(/[-–—]/)[0].trim();
+  const d = new Date(`${firstSegment}, ${year}`);
   if (!isNaN(d.getTime())) return d;
   return null;
 }
