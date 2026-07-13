@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadHubRouteImport } from './routes/upload-hub'
 import { Route as SimilarwebRouteImport } from './routes/similarweb'
 import { Route as ReferenceRouteImport } from './routes/reference'
+import { Route as MetaAdsRouteImport } from './routes/meta-ads'
 import { Route as MeeshoAdsRouteImport } from './routes/meesho-ads'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsMetaAdsRouteImport } from './routes/settings.meta-ads'
 import { Route as MonthMonthRouteImport } from './routes/month.$month'
 
 const UploadHubRoute = UploadHubRouteImport.update({
@@ -31,6 +33,11 @@ const ReferenceRoute = ReferenceRouteImport.update({
   path: '/reference',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetaAdsRoute = MetaAdsRouteImport.update({
+  id: '/meta-ads',
+  path: '/meta-ads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MeeshoAdsRoute = MeeshoAdsRouteImport.update({
   id: '/meesho-ads',
   path: '/meesho-ads',
@@ -39,6 +46,11 @@ const MeeshoAdsRoute = MeeshoAdsRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsMetaAdsRoute = SettingsMetaAdsRouteImport.update({
+  id: '/settings/meta-ads',
+  path: '/settings/meta-ads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MonthMonthRoute = MonthMonthRouteImport.update({
@@ -50,62 +62,76 @@ const MonthMonthRoute = MonthMonthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
+  '/meta-ads': typeof MetaAdsRoute
   '/reference': typeof ReferenceRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
+  '/settings/meta-ads': typeof SettingsMetaAdsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
+  '/meta-ads': typeof MetaAdsRoute
   '/reference': typeof ReferenceRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
+  '/settings/meta-ads': typeof SettingsMetaAdsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
+  '/meta-ads': typeof MetaAdsRoute
   '/reference': typeof ReferenceRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
+  '/settings/meta-ads': typeof SettingsMetaAdsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/meesho-ads'
+    | '/meta-ads'
     | '/reference'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
+    | '/settings/meta-ads'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/meesho-ads'
+    | '/meta-ads'
     | '/reference'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
+    | '/settings/meta-ads'
   id:
     | '__root__'
     | '/'
     | '/meesho-ads'
+    | '/meta-ads'
     | '/reference'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
+    | '/settings/meta-ads'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MeeshoAdsRoute: typeof MeeshoAdsRoute
+  MetaAdsRoute: typeof MetaAdsRoute
   ReferenceRoute: typeof ReferenceRoute
   SimilarwebRoute: typeof SimilarwebRoute
   UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
+  SettingsMetaAdsRoute: typeof SettingsMetaAdsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -131,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/meta-ads': {
+      id: '/meta-ads'
+      path: '/meta-ads'
+      fullPath: '/meta-ads'
+      preLoaderRoute: typeof MetaAdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/meesho-ads': {
       id: '/meesho-ads'
       path: '/meesho-ads'
@@ -143,6 +176,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/meta-ads': {
+      id: '/settings/meta-ads'
+      path: '/settings/meta-ads'
+      fullPath: '/settings/meta-ads'
+      preLoaderRoute: typeof SettingsMetaAdsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/month/$month': {
@@ -158,10 +198,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MeeshoAdsRoute: MeeshoAdsRoute,
+  MetaAdsRoute: MetaAdsRoute,
   ReferenceRoute: ReferenceRoute,
   SimilarwebRoute: SimilarwebRoute,
   UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
+  SettingsMetaAdsRoute: SettingsMetaAdsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
