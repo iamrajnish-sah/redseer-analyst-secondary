@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      meta_ads: {
+        Row: {
+          ad_archive_id: string
+          advertiser_name: string | null
+          brand: string | null
+          category: string | null
+          created_at: string
+          creative_text: string | null
+          cta: string | null
+          description: string | null
+          end_date: string | null
+          fetched_at: string
+          headline: string | null
+          id: string
+          language: string | null
+          media_type: string | null
+          page_id: string | null
+          page_name: string | null
+          platforms: string[]
+          raw: Json | null
+          snapshot_url: string | null
+          start_date: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          ad_archive_id: string
+          advertiser_name?: string | null
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          creative_text?: string | null
+          cta?: string | null
+          description?: string | null
+          end_date?: string | null
+          fetched_at?: string
+          headline?: string | null
+          id?: string
+          language?: string | null
+          media_type?: string | null
+          page_id?: string | null
+          page_name?: string | null
+          platforms?: string[]
+          raw?: Json | null
+          snapshot_url?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ad_archive_id?: string
+          advertiser_name?: string | null
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          creative_text?: string | null
+          cta?: string | null
+          description?: string | null
+          end_date?: string | null
+          fetched_at?: string
+          headline?: string | null
+          id?: string
+          language?: string | null
+          media_type?: string | null
+          page_id?: string | null
+          page_name?: string | null
+          platforms?: string[]
+          raw?: Json | null
+          snapshot_url?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
