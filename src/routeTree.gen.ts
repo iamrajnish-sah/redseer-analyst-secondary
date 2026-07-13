@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadHubRouteImport } from './routes/upload-hub'
 import { Route as SimilarwebRouteImport } from './routes/similarweb'
-import { Route as SearchInterestComparisonRouteImport } from './routes/search-interest-comparison'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as MeeshoAdsRouteImport } from './routes/meesho-ads'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,12 +26,6 @@ const SimilarwebRoute = SimilarwebRouteImport.update({
   path: '/similarweb',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SearchInterestComparisonRoute =
-  SearchInterestComparisonRouteImport.update({
-    id: '/search-interest-comparison',
-    path: '/search-interest-comparison',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ReferenceRoute = ReferenceRouteImport.update({
   id: '/reference',
   path: '/reference',
@@ -58,7 +51,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
   '/reference': typeof ReferenceRoute
-  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -67,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
   '/reference': typeof ReferenceRoute
-  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -77,7 +68,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/meesho-ads': typeof MeeshoAdsRoute
   '/reference': typeof ReferenceRoute
-  '/search-interest-comparison': typeof SearchInterestComparisonRoute
   '/similarweb': typeof SimilarwebRoute
   '/upload-hub': typeof UploadHubRoute
   '/month/$month': typeof MonthMonthRoute
@@ -88,7 +78,6 @@ export interface FileRouteTypes {
     | '/'
     | '/meesho-ads'
     | '/reference'
-    | '/search-interest-comparison'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
@@ -97,7 +86,6 @@ export interface FileRouteTypes {
     | '/'
     | '/meesho-ads'
     | '/reference'
-    | '/search-interest-comparison'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
@@ -106,7 +94,6 @@ export interface FileRouteTypes {
     | '/'
     | '/meesho-ads'
     | '/reference'
-    | '/search-interest-comparison'
     | '/similarweb'
     | '/upload-hub'
     | '/month/$month'
@@ -116,7 +103,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MeeshoAdsRoute: typeof MeeshoAdsRoute
   ReferenceRoute: typeof ReferenceRoute
-  SearchInterestComparisonRoute: typeof SearchInterestComparisonRoute
   SimilarwebRoute: typeof SimilarwebRoute
   UploadHubRoute: typeof UploadHubRoute
   MonthMonthRoute: typeof MonthMonthRoute
@@ -136,13 +122,6 @@ declare module '@tanstack/react-router' {
       path: '/similarweb'
       fullPath: '/similarweb'
       preLoaderRoute: typeof SimilarwebRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search-interest-comparison': {
-      id: '/search-interest-comparison'
-      path: '/search-interest-comparison'
-      fullPath: '/search-interest-comparison'
-      preLoaderRoute: typeof SearchInterestComparisonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reference': {
@@ -180,7 +159,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MeeshoAdsRoute: MeeshoAdsRoute,
   ReferenceRoute: ReferenceRoute,
-  SearchInterestComparisonRoute: SearchInterestComparisonRoute,
   SimilarwebRoute: SimilarwebRoute,
   UploadHubRoute: UploadHubRoute,
   MonthMonthRoute: MonthMonthRoute,
