@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "market-compass",
+      "version": "0.1.0",
+      "title": "Market Compass"
+    },
+    "tools": [
+      {
+        "name": "get_cross_comparison_matrix",
+        "title": "Get 12-month matrix",
+        "description": "Return the full 12-month cross-comparison matrix: festival counts (current vs last year), wedding muhurat counts, sale-event counts, weather flag, analyst sentiment label, confidence and festive density.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "month": {
+              "description": "Optional 3-letter month key to return a single row.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_month_signals",
+        "title": "Get month signals",
+        "description": "Return the secondary-research signal bundle for one calendar month: festive density, festivals with drift, wedding/auspicious muhurat counts (CY vs LY), platform sale windows, academic cycles and the season profile.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "month": {
+              "type": "string",
+              "description": "Month as a 3-letter key (Jan, Feb, ... Dec) or full name (January)."
+            }
+          },
+          "required": [
+            "month"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_macro_indicators",
+        "title": "Get macro indicators",
+        "description": "Return the macro & consumer indicator set with month-on-month comparison (inflation, fuel, UPI volume, card spends, repo rate), plus the electronics import sub-grid and supply-chain watch factors.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Optional text filter on the indicator label.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_platform_traffic",
+        "title": "Get platform traffic",
+        "description": "Return the tracked SimilarWeb-style web traffic snapshot for Indian e-commerce platforms: monthly visits (millions), MoM change %, avg visit duration and bounce rate.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "platform": {
+              "description": "Optional platform name filter, e.g. \"Myntra\".",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_factor_library",
+        "title": "Search factor library",
+        "description": "Search the secondary-indicator reference library (55+ factors) by keyword or category. Each result includes why the factor matters, its source and its update frequency.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Keyword matched against factor name, rationale and source.",
+              "type": "string"
+            },
+            "category": {
+              "description": "Category filter, e.g. Calendar, Climate, Macroeconomic, Platform Intel.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max results, 1-60 (default 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_meta_ads",
+        "title": "List Meta ads",
+        "description": "List Meta (Facebook/Instagram) Ad Library records tracked by this app, newest first. Filter by brand, status, media type or a free-text query on the creative copy.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "brand": {
+              "description": "Brand/advertiser filter, e.g. \"Meesho\".",
+              "type": "string"
+            },
+            "status": {
+              "description": "Ad status filter.",
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "INACTIVE"
+              ]
+            },
+            "media_type": {
+              "description": "Media type filter, e.g. image, video, dco.",
+              "type": "string"
+            },
+            "query": {
+              "description": "Free-text search across creative text and headline.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max rows to return, 1-100 (default 25).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "meta_ads_analytics",
+        "title": "Meta ads analytics",
+        "description": "Aggregate analytics over the tracked Meta Ad Library records: totals, active share, average days running, and breakdowns by platform, media type, CTA, language, category and advertiser.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "brand": {
+              "description": "Restrict the analysis to one brand/advertiser.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
