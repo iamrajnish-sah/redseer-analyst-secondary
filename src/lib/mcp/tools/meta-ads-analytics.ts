@@ -23,7 +23,7 @@ export default defineTool({
   handler: async ({ brand }) => {
     let q = supabaseAnon()
       .from("meta_ads")
-      .select("brand,advertiser_name,platforms,media_type,language,cta,category,status,start_date")
+      .select("brand,advertiser_name,page_name,platforms,media_type,language,cta,category,status,start_date")
       .limit(5000);
     if (brand) q = q.ilike("brand", `%${brand}%`);
 
@@ -62,7 +62,7 @@ export default defineTool({
       by_cta: tally(rows.map((r) => r.cta)),
       by_language: tally(rows.map((r) => r.language)),
       by_category: tally(rows.map((r) => r.category)),
-      top_advertisers: Object.entries(tally(rows.map((r) => r.advertiser_name ?? r.page_name)))
+      top_advertisers: Object.entries(tally(rows.map((r) => r.advertiser_name ?? r.page_name ?? null)))
         .slice(0, 10)
         .map(([name, count]) => ({ name, count })),
     };
